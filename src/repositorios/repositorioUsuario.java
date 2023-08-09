@@ -8,7 +8,7 @@ import model.Usuario;
 /**
  * Repositório de gerenciamento de usuários.
  */
-public class repositorioUsuario {
+public class RepositorioUsuario {
 
     private final Banco banco;
     private Usuario usuarioLogado;
@@ -18,7 +18,7 @@ public class repositorioUsuario {
      *
      * @param banco O banco de dados.
      */
-    public repositorioUsuario(Banco banco) {
+    public RepositorioUsuario(Banco banco) {
         this.banco = banco;
     }
 
