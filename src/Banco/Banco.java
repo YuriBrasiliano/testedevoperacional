@@ -1,11 +1,11 @@
-package Banco;
+package banco;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import Model.*;
+import model.*;
 
 public class Banco {
 
@@ -56,10 +56,10 @@ public class Banco {
         Cliente cliente = new Cliente("07221134049", "Allan da Silva", "cliente", 20);
         Cliente cliente2 = new Cliente("72840700050", "Samuel da Silva", "cliente2", 24);
 
-        usuarios.add(new Usuario("admin", "admin123", null, null));
-        usuarios.add(new Usuario("empresa", "level123", null, empresas.get(1)));
-        usuarios.add(new Usuario("empresa2", "safewayp123", null, empresas.get(2)));
-        usuarios.add(new Usuario("empresa3", "safewayr123", null, empresas.get(3)));
+        usuarios.add(new Usuario("admin", "Admin123", null, null));
+        usuarios.add(new Usuario("Level", "Level123", null, empresas.get(1)));
+        usuarios.add(new Usuario("SafePadaria", "SafeP123", null, empresas.get(2)));
+        usuarios.add(new Usuario("SafeRestaurante", "SafeR123", null, empresas.get(3)));
         usuarios.add(new Usuario("Allan", "Allan123", cliente, null));
         usuarios.add(new Usuario("Samuel", "Samuel123", cliente2,null));
     }
