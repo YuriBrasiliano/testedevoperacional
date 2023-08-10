@@ -253,7 +253,7 @@ public class Main {
 				System.out.println("Resumo da compra: ");
 
 				// listando produtos
-				List<Produto> ProdutosComprados = carrinho.stream().filter(product -> product.getEmpresa().getId().equals(empresaId)).toList();
+				List<Produto> ProdutosComprados = carrinho.stream().filter(produto -> produto.getEmpresa().getId().equals(empresaId)).toList();
 				if (ProdutosComprados.isEmpty()) System.out.println("Você não comprou nada");
 				else {
 					for (Produto produto : ProdutosComprados) {
@@ -263,12 +263,15 @@ public class Main {
 
 				Optional<Empresa> EmpresasEncontradas = empresas.stream().filter(empresaSelecionada -> empresaSelecionada.getId().equals(empresaId)).findFirst();
 				if (EmpresasEncontradas.isPresent()) {
-					Venda venda = new GerarVenda().criarVenda(EmpresasEncontradas.get(), usuario.getCliente(), vendas, carrinho);
+					Cliente cliente = usuario.getCliente();
+					cliente.setUsername(usuario.getUsername());
+					Venda venda = new GerarVenda().criarVenda(EmpresasEncontradas.get(), cliente, vendas, carrinho);
 					System.out.println("Total: R$" + venda.getValor());
 					System.out.println("************************************************************");
 					carrinho.clear();
 					vendas.add(venda);
-				} else {
+				}
+				else {
 					System.out.println("Empresa não encontrada, tente novamente");
 				}
 			}
@@ -278,7 +281,7 @@ public class Main {
 				System.out.println("COMPRAS EFETUADAS");
 
 				// listando vendas
-				List<Venda> VendasUsuario = vendas.stream().filter(venda -> venda.getCliente().getUsername().equals(usuario.getUsername())).toList();
+				List<Venda> VendasUsuario = vendas.stream().filter(venda -> venda.getClienteUsername().equals(usuario.getUsername())).toList();
 				if (VendasUsuario.isEmpty()) {System.out.println("Nenhuma compra foi efetuada até o momento.");
 				System.out.println("************************************************************");}
 				else {

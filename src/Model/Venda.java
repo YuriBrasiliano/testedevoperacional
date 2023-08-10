@@ -41,6 +41,10 @@ public class Venda {
 		return cliente;
 	}
 
+	public String getClienteUsername(){
+		return cliente.getUsername();
+	}
+
 	public void setCliente(Cliente cliente) {
 		this.cliente = cliente;
 	}

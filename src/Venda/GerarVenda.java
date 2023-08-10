@@ -4,7 +4,6 @@ import model.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class GerarVenda {
 
@@ -12,14 +11,6 @@ public class GerarVenda {
         // Calcula o valor total da venda e as taxas
         Double total = carrinho.stream().mapToDouble(Produto::getPreco).sum();
         Double taxas = total * empresa.getTaxa();
-
-        // Verifica o estoque antes de criar a venda
-        for (Produto produto : carrinho) {
-            if (produto.getQuantidade() < 1) {
-                System.out.println("Não há estoque suficiente para o produto: " + produto.getNome());
-                return null;
-            }
-        }
 
         // Cria a venda
         int vendaId = vendas.isEmpty() ? 1 : vendas.get(vendas.size() - 1).getCódigo() + 1;
