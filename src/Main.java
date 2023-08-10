@@ -1,10 +1,6 @@
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
-import java.util.stream.Collectors;
-
 import model.*;
 import banco.*;
 import repositorios.*;
@@ -43,6 +39,8 @@ public class Main {
 			executarAdmin(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
 			return;
 		}
+		System.out.println("Escolha uma opção para iniciar");
+		if (usuario.IsEmpresa()) executarEmpresa(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
 	}
 		
 		public static void executarAdmin(Scanner scanner, Usuario usuario,
@@ -95,10 +93,76 @@ public class Main {
 			}
 		}
 
-		executarAdmin(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);
-			
-		
-		
+		executarAdmin(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);	
 
 		}
+		public static void executarEmpresa(Scanner scanner, Usuario usuario,
+								  List<Usuario> usuarios, List<Empresa> empresas,
+								  List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
+		System.out.println("1 - Listar vendas");
+		System.out.println("2 - Ver produtos");
+		System.out.println("0 - Deslogar");
+
+		switch (scanner.nextInt()) {
+			case 1 -> {
+				System.out.println();
+				System.out.println("************************************************************");
+				System.out.println("VENDAS EFETUADAS");
+
+				List<Venda> VendasEmpresa = vendas.stream().filter(venda -> venda.getEmpresa().getId().equals(usuario.getEmpresa().getId())).toList();
+				if (VendasEmpresa.isEmpty()) System.out.println("Essa empresa ainda não vendeu nenhum produto.");
+				else {
+					for (Venda venda : VendasEmpresa) {
+						// listando vendas
+						System.out.println("************************************************************");
+						System.out.println("Venda de código: " + venda.getCódigo() + " no CPF " + venda.getCliente().getCpf() + ": ");
+						venda.getItens().forEach(produto -> System.out.println(produto.getId() + " - " + produto.getNome() + "    R$" + produto.getPreco()));
+
+						// total
+						System.out.println("Total: R$" + venda.getValor());
+						System.out.println("Taxa a ser paga: R$" + venda.getComissaoSistema());
+						System.out.println("Total Líquido  para empresa: R$" + (venda.getValor() - venda.getComissaoSistema()));
+						System.out.println("************************************************************");
+					}
+				}
+
+				// listando saldo
+				System.out.println("Saldo da empresa: " + usuario.getEmpresa().getSaldo());
+				System.out.println("************************************************************");
+			}
+			case 2 -> {
+				System.out.println();
+				System.out.println("************************************************************");
+				System.out.println("MEUS PRODUTOS");
+
+				// listando produtos
+				List<Produto> ProdutosEmpresa = produtos.stream().filter(produto -> produto.getEmpresa().getId().equals(usuario.getEmpresa().getId())).toList();
+				if (ProdutosEmpresa.isEmpty()) System.out.println("Essa empresa ainda não possui nenhum produto.");
+				else {
+					for (Produto produto : ProdutosEmpresa) {
+						// informações do produto
+						System.out.println("************************************************************");
+						System.out.println("Código: " + produto.getId());
+						System.out.println("Produto: " + produto.getNome());
+						System.out.println("Quantidade em estoque: " + produto.getQuantidade());
+						System.out.println("Valor: R$" + produto.getPreco());
+						System.out.println("************************************************************");
+					}
+				}
+
+				System.out.println("Saldo da empresa: " + usuario.getEmpresa().getSaldo());
+				System.out.println("************************************************************");
+			}
+			case 0 -> {
+				if (repositorioUsuario.getUsuarioLogado().IsAdmin()) repositorioUsuario.getUsuarioLogado().setEmpresa(null);
+
+				repositorioUsuario.logout();
+				executar(usuarios, empresas, produtos, carrinho, vendas);
+				return;
+			}
+		}
+
+		executarEmpresa(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);
+	}
+
 	}
