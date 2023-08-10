@@ -25,11 +25,6 @@ public class GerarVenda {
         int vendaId = vendas.isEmpty() ? 1 : vendas.get(vendas.size() - 1).getCódigo() + 1;
         Venda venda = new Venda(vendaId, new ArrayList<>(carrinho), total, taxas, empresa, cliente);
 
-        // Atualiza o estoque após a venda
-        for (Produto produto : carrinho) {
-            produto.setQuantidade(produto.getQuantidade() - 1);
-        }
-
         // Atualiza o saldo da empresa
         empresa.setSaldo(empresa.getSaldo() + total - taxas);
 
