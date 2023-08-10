@@ -244,7 +244,13 @@ public class Main {
 
 					produtos.stream().filter(ProdutoSelecionado -> ProdutoSelecionado.getId().equals(finalprodutoId))
 							.findFirst()
-							.ifPresent(carrinho::add);
+							.ifPresent(produtoSelecionado -> {
+								if (produtoSelecionado.getQuantidade() > 0) {
+									carrinho.add(produtoSelecionado);
+								} else {
+									System.out.println("Produto fora de estoque: " + produtoSelecionado.getNome());
+								}
+							});
 				} while (produtoId != 0);
 
 				System.out.println("************************************************************");
