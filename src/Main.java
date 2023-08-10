@@ -4,6 +4,7 @@ import java.util.Scanner;
 import model.*;
 import banco.*;
 import Repositorio.*;
+import Venda.GerarVenda;
 
 public class Main {
 
@@ -41,6 +42,7 @@ public class Main {
 		}
 		System.out.println("Escolha uma opção para iniciar");
 		if (usuario.IsEmpresa()) executarEmpresa(sc,usuarios, usuario, empresas, produtos, carrinho, vendas);
+		else executarUsuario(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
 	}
 		
 		public static void executarAdmin(Scanner scanner, List<Usuario> usuarios, Usuario usuario, List<Empresa> empresas,
@@ -200,6 +202,100 @@ public class Main {
 		executarEmpresa(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
 	}
 
-	
+		public static void executarUsuario(Scanner scanner, Usuario usuario,
+									  List<Usuario> usuarios, List<Empresa> empresas,
+									  List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
+		System.out.println("1 - Relizar Compras");
+		System.out.println("2 - Ver Compras");
+		System.out.println("0 - Deslogar");
+
+		switch (scanner.nextInt()) {
+			case 1 -> {
+				System.out.println("Para realizar uma compra, escolha a empresa onde deseja comprar: ");
+
+				// listando empresas
+				if (empresas.isEmpty()) {
+					System.out.println("Não existem empresas no nosso banco de dados.");
+
+					executar(usuarios, empresas, produtos, carrinho, vendas);
+					return;
+				} else empresas.forEach(empresa -> System.out.println(empresa.getId() + " - " + empresa.getNome()));
+
+				Integer empresaId = scanner.nextInt();
+				int produtoId;
+
+				// escolhendo produtos
+				do {
+					System.out.println("Escolha os seus produtos: ");
+					System.out.println("Para finalizar a compra digite 0");
+
+					// listando produtos
+					List<Produto> ProdutosEmpresa = produtos.stream().filter(produto -> produto.getEmpresa().getId().equals(empresaId)).toList();
+					if (ProdutosEmpresa.isEmpty()) System.out.println("Essa empresa não possui nenhum produto.");
+					else {
+						for (Produto produto : ProdutosEmpresa) {
+							System.out.println(produto.getId() + " - " + produto.getNome());
+						}
+					}
+
+					// adicionando produto escolhido para o carrinho
+					produtoId = scanner.nextInt();
+					int finalprodutoId = produtoId;
+
+					produtos.stream().filter(ProdutoSelecionado -> ProdutoSelecionado.getId().equals(finalprodutoId))
+							.findFirst()
+							.ifPresent(carrinho::add);
+				} while (produtoId != 0);
+
+				System.out.println("************************************************************");
+				System.out.println("Resumo da compra: ");
+
+				// listando produtos
+				List<Produto> ProdutosComprados = carrinho.stream().filter(product -> product.getEmpresa().getId().equals(empresaId)).toList();
+				if (ProdutosComprados.isEmpty()) System.out.println("Você não comprou nada");
+				else {
+					for (Produto produto : ProdutosComprados) {
+						System.out.println(produto.getId() + " - " + produto.getNome() + "    R$" + produto.getPreco());
+					}
+				}
+
+				Optional<Empresa> EmpresasEncontradas = empresas.stream().filter(empresaSelecionada -> empresaSelecionada.getId().equals(empresaId)).findFirst();
+				if (EmpresasEncontradas.isPresent()) {
+					Venda venda = new GerarVenda().criarVenda(EmpresasEncontradas.get(), usuario.getCliente(), vendas, carrinho);
+					System.out.println("Total: R$" + venda.getValor());
+					System.out.println("************************************************************");
+					carrinho.clear();
+					vendas.add(venda);
+				} else {
+					System.out.println("Empresa não encontrada, tente novamente");
+				}
+			}
+			case 2 -> {
+				System.out.println();
+				System.out.println("************************************************************");
+				System.out.println("COMPRAS EFETUADAS");
+
+				// listando vendas
+				List<Venda> VendasUsuario = vendas.stream().filter(venda -> venda.getCliente().getUsername().equals(usuario.getUsername())).toList();
+				if (VendasUsuario.isEmpty()) {System.out.println("Nenhuma compra foi efetuada até o momento.");
+				System.out.println("************************************************************");}
+				else {
+					for (Venda venda : VendasUsuario) {
+						System.out.println("************************************************************");
+						System.out.println("Compra de código: " + venda.getCódigo() + " na empresa " + venda.getEmpresa().getNome() + ": ");
+
+						// listando produtos
+						venda.getItens().forEach(product -> System.out.println(product.getId() + " - " + product.getNome() + "    R$" + product.getPreco()));
+
+						System.out.println("Total: R$" + venda.getValor());
+						System.out.println("************************************************************");
+					}
+				}
+			}
+			case 0 -> repositorioUsuario.logout();
+		}
+
+		executar(usuarios, empresas, produtos, carrinho, vendas);
+	}
 
 }

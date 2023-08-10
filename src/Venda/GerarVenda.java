@@ -19,7 +19,7 @@ public class GerarVenda {
      * @param carrinho  A lista de produtos no carrinho.
      * @return A venda criada.
      */
-    public Venda createSale(Empresa empresa, Cliente cliente, List<Venda> vendas, List<Produto> carrinho) {
+    public Venda criarVenda(Empresa empresa, Cliente cliente, List<Venda> vendas, List<Produto> carrinho) {
         // Calcula o total do carrinho e as taxas
         Double total = carrinho.stream().mapToDouble(Produto::getPreco).sum();
         Double taxas = total * empresa.getTaxa();
@@ -31,7 +31,7 @@ public class GerarVenda {
         Venda venda = new Venda(vendaId, new ArrayList<>(carrinho), total, taxas, empresa, cliente);
 
         // Atualiza o saldo da empresa
-        empresa.setSaldo(empresa.getSaldo() + total);
+        empresa.setSaldo(empresa.getSaldo() + (total - taxas));
 
         return venda;
     }
