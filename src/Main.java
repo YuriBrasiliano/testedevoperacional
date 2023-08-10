@@ -16,7 +16,7 @@ public class Main {
 		executar(banco.getUsuarios(), banco.getEmpresas(), banco.getProdutos(), banco.getCarrinho(), banco.getVendas());
 	}
 
-	public static void executar(List<Usuario> usuarios, List<Empresa> empresas,
+	public static void executar(List<Usuario> usuarios,List<Empresa> empresas,
 			List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
 		Scanner sc = new Scanner(System.in);
 	
@@ -36,17 +36,18 @@ public class Main {
 		Usuario usuario = repositorioUsuario.getUsuarioLogado();
 
 		if (usuario.IsAdmin()) {
-			executarAdmin(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
+			executarAdmin(sc, usuarios, usuario, empresas, produtos, carrinho, vendas);
 			return;
 		}
 		System.out.println("Escolha uma opção para iniciar");
-		if (usuario.IsEmpresa()) executarEmpresa(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
+		if (usuario.IsEmpresa()) executarEmpresa(sc,usuarios, usuario, empresas, produtos, carrinho, vendas);
 	}
 		
-		public static void executarAdmin(Scanner scanner, Usuario usuario,
-		List<Usuario> usuarios, List<Empresa> empresas,
+		public static void executarAdmin(Scanner scanner, List<Usuario> usuarios, Usuario usuario, List<Empresa> empresas,
 		List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
-			System.out.println("1 - Visualizar uma empresa");
+			System.out.println("1 - Visualizar Empresas");
+			System.out.println("2 - Visualizar Pedidos");
+			System.out.println("3 - Visualizar Usuários");
 			System.out.println("0 - Deslogar");
 
 			switch (scanner.nextInt()) {
@@ -83,9 +84,39 @@ public class Main {
 			System.out.println("Logado como empresa. Escolha uma opção para continuar: ");
 
 				usuario.setEmpresa(EmpresasEncontradas.get());
-				executarEmpresa(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);
+				executarEmpresa(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
 				return;
 			}}
+			case 2 -> {
+
+			}
+			case 3 -> {
+				if (usuarios.isEmpty()) {
+			System.out.println("Não existem usuários no nosso banco de dados.");
+			executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
+			return;
+			}else {
+				for (Usuario user : usuarios) {
+					System.out.println("Username - " + user.getUsername());
+					if(user.IsCliente()){
+					System.out.println("Usuário é um Cliente");
+					System.out.println("Nome - " + user.getCliente().getNome());
+					System.out.println("CPF - " + user.getCliente().getCpf());
+					System.out.println("Idade - " + user.getCliente().getIdade());
+				}else if (user.IsEmpresa()){
+					System.out.println("Usuário é uma Empresa");
+					System.out.println("ID - " + user.getEmpresa().getId());
+					System.out.println("Nome - " + user.getEmpresa().getNome());
+					System.out.println("CNPJ - " + user.getEmpresa().getCnpj());
+					System.out.println("Saldo - " + user.getEmpresa().getSaldo());
+					System.out.println("Taxa Cobrada - " + user.getEmpresa().getTaxa());
+				}else{
+					System.out.println("Usuário é um Administrador");
+				}
+					System.out.println("************************************************************");
+				}
+			}
+			}
 			case 0 -> {
 				repositorioUsuario.logout();
 				executar(usuarios, empresas, produtos, carrinho, vendas);
@@ -93,11 +124,10 @@ public class Main {
 			}
 		}
 
-		executarAdmin(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);	
+		executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);	
 
 		}
-		public static void executarEmpresa(Scanner scanner, Usuario usuario,
-								  List<Usuario> usuarios, List<Empresa> empresas,
+		public static void executarEmpresa(Scanner scanner, List<Usuario> usuarios, Usuario usuario, List<Empresa> empresas,
 								  List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
 		System.out.println("1 - Listar vendas");
 		System.out.println("2 - Ver produtos");
@@ -156,7 +186,7 @@ public class Main {
 			}
 			case 3 -> {
 				System.out.println("************************************************************");
-				executarAdmin(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);
+				executarAdmin(scanner, usuarios, usuario,  empresas, produtos, carrinho, vendas);
 			}
 			case 0 -> {
 				if (repositorioUsuario.getUsuarioLogado().IsAdmin()) repositorioUsuario.getUsuarioLogado().setEmpresa(null);
@@ -167,7 +197,9 @@ public class Main {
 			}
 		}
 
-		executarEmpresa(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);
+		executarEmpresa(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
 	}
 
-	}
+	
+
+}
