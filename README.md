@@ -21,7 +21,7 @@ Agradecemos às seguintes pessoas que contribuíram para este projeto:
       <a href="#">
         <img src="https://avatars3.githubusercontent.com/u/31936044" width="100px;" alt="Foto do Yuri Brasiliano no GitHub"/><br>
         <sub>
-          <b>Iuri Silva</b>
+          <b>Yuri Brasiliano</b>
         </sub>
       </a>
     </td>
