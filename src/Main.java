@@ -8,131 +8,168 @@ import Venda.GerarVenda;
 
 public class Main {
 
-	public static RepositorioUsuario repositorioUsuario;
+    // Declaração do repositório de usuários como estático para ser acessado em toda a classe
+    public static RepositorioUsuario repositorioUsuario;
 
-	public static void main(String[] args) {
-		Banco banco = new Banco();
-		repositorioUsuario = new RepositorioUsuario(banco);
+    public static void main(String[] args) {
+        Banco banco = new Banco();
+        repositorioUsuario = new RepositorioUsuario(banco);
 
-		executar(banco.getUsuarios(), banco.getEmpresas(), banco.getProdutos(), banco.getCarrinho(), banco.getVendas());
-	}
+        executar(banco.getUsuarios(), banco.getEmpresas(), banco.getProdutos(), banco.getCarrinho(), banco.getVendas());
+    }
 
-	public static void executar(List<Usuario> usuarios,List<Empresa> empresas,
-			List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
-		Scanner sc = new Scanner(System.in);
-	
-		if (!repositorioUsuario.isLogged()) {
-			System.out.println("Entre com seu usuário e senha:");
-			System.out.print("Usuário: ");
-			String username = sc.next();
-			System.out.print("Senha: ");
-			String senha = sc.next();
-			ErroData<Usuario> loginResult = repositorioUsuario.login(username, senha);
-				if (!loginResult.isSuccess()) {
-					System.out.println(loginResult.getError());
-					executar(usuarios, empresas, produtos, carrinho, vendas);
-					return;
-			}
-		}
-		Usuario usuario = repositorioUsuario.getUsuarioLogado();
+    // Função para executar o programa
+    public static void executar(List<Usuario> usuarios, List<Empresa> empresas,
+                                List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
+        Scanner sc = new Scanner(System.in);
 
-		if (usuario.IsAdmin()) {
-			executarAdmin(sc, usuarios, usuario, empresas, produtos, carrinho, vendas);
-			return;
-		}
-		System.out.println("Escolha uma opção para iniciar");
-		if (usuario.IsEmpresa()) executarEmpresa(sc,usuarios, usuario, empresas, produtos, carrinho, vendas);
-		else executarUsuario(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
-	}
-		
-		public static void executarAdmin(Scanner scanner, List<Usuario> usuarios, Usuario usuario, List<Empresa> empresas,
-		List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
+        // Verificar se o usuário está logado
+        if (!repositorioUsuario.isLogged()) {
+            System.out.println("Entre com seu usuário e senha:");
+            System.out.print("Usuário: ");
+            String username = sc.next();
+            System.out.print("Senha: ");
+            String senha = sc.next();
+            
+            // Tentativa de login
+            ErroData<Usuario> loginResult = repositorioUsuario.login(username, senha);
+            if (!loginResult.isSuccess()) {
+                System.out.println(loginResult.getError());
+                executar(usuarios, empresas, produtos, carrinho, vendas);
+                return;
+            }
+        }
+
+        Usuario usuario = repositorioUsuario.getUsuarioLogado();
+
+        // Verificar se o usuário é administrador
+        if (usuario.IsAdmin()) {
+            executarAdmin(sc, usuarios, usuario, empresas, produtos, carrinho, vendas);
+            return;
+        }
+
+        System.out.println("Escolha uma opção para iniciar");
+
+        // Verificar se o usuário é uma empresa
+        if (usuario.IsEmpresa()) {
+            executarEmpresa(sc, usuarios, usuario, empresas, produtos, carrinho, vendas);
+        } else {
+            executarUsuario(sc, usuario, usuarios, empresas, produtos, carrinho, vendas);
+        }
+    }
+		public static void executarAdmin(Scanner scanner, List<Usuario> usuarios, Usuario usuario,
+                                 List<Empresa> empresas, List<Produto> produtos,
+                                 List<Produto> carrinho, List<Venda> vendas) {
 			System.out.println("1 - Visualizar Empresas");
 			System.out.println("2 - Visualizar Pedidos");
 			System.out.println("3 - Visualizar Usuários");
 			System.out.println("0 - Deslogar");
 
-			switch (scanner.nextInt()) {
-			case 1 -> {
-			System.out.println("Escolha a empresa para visualizar as informações: ");
+    int opcao = scanner.nextInt(); // Captura a opção escolhida pelo administrador
+    switch (opcao) {
+        case 1 -> {
+            System.out.println("Escolha a empresa para visualizar as informações: ");
 
-			// listando empresas
-			if (empresas.isEmpty()) {
-			System.out.println("Não existem empresas no nosso banco de dados.");
-			executar(usuarios, empresas, produtos, carrinho, vendas);
-			return;
-			}else {
-				for (Empresa empresa : empresas) {
-					System.out.println(empresa.getId() + " - " + empresa.getNome());
-				}
-			
+            // Listando empresas
+            if (empresas.isEmpty()) {
+                System.out.println("Não existem empresas no nosso banco de dados.");
+                executar(usuarios, empresas, produtos, carrinho, vendas);
+                return;
+            } else {
+                for (Empresa empresa : empresas) {
+                    System.out.println(empresa.getId() + " - " + empresa.getNome());
+                }
+            }
 
-			int empresaId;
-			Optional<Empresa> EmpresasEncontradas;
+            int empresaId;
+            Optional<Empresa> empresaEncontrada;
 
-			do {
-				empresaId = scanner.nextInt();
+            do {
+                empresaId = scanner.nextInt(); // Captura o ID da empresa escolhida
 				int finalempresaId = empresaId;
-				EmpresasEncontradas = empresas.stream()
-					.filter(empresaSelecionada -> empresaSelecionada.getId().equals(finalempresaId))
-					.findFirst();
-			
-				if (EmpresasEncontradas.isEmpty()) {
-					System.out.println("Empresa não encontrada, tente novamente");
-				}
-			} while (EmpresasEncontradas.isEmpty());
-			
+                empresaEncontrada = empresas.stream()
+                    .filter(empresaSelecionada -> empresaSelecionada.getId().equals(finalempresaId))
+                    .findFirst();
 
-			System.out.println("Logado como empresa. Escolha uma opção para continuar: ");
+                if (empresaEncontrada.isEmpty()) {
+                    System.out.println("Empresa não encontrada, tente novamente");
+                }
+            } while (empresaEncontrada.isEmpty());
 
-				usuario.setEmpresa(EmpresasEncontradas.get());
-				executarEmpresa(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
-				return;
-			}}
-			case 2 -> {
+            System.out.println("Logado como empresa. Escolha uma opção para continuar: ");
+            usuario.setEmpresa(empresaEncontrada.get()); // Define a empresa escolhida para o usuário
+            executarEmpresa(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
+            return;
+        }
+        case 2 -> {
+			List<Venda> vendasList = vendas;
+			if(vendasList.isEmpty()){
+				System.out.println("Nenhum pedido registrado");
+				System.out.println("************************************************************");
 
 			}
-			case 3 -> {
-				if (usuarios.isEmpty()) {
-			System.out.println("Não existem usuários no nosso banco de dados.");
+
+			for (Venda venda : vendasList) {
+				System.out.println("************************************************************");
+				System.out.println("Compra de código: " + venda.getCódigo() + " pelo cliente " +venda.getClienteUsername()+ " na empresa " + venda.getEmpresa().getNome() + ": ");
+			
+				// Listando produtos
+				venda.getItens().forEach(product -> System.out.println(product.getId() + " - " + product.getNome() + "    R$" + product.getPreco()));
+			
+				System.out.println("Total: R$" + venda.getValor());
+				System.out.println("************************************************************");
+			}
+			
+					
+				
+        }
+        case 3 -> {
+            if (usuarios.isEmpty()) {
+                System.out.println("Não existem usuários no nosso banco de dados.");
+                executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
+                return;
+            } else {
+                for (Usuario user : usuarios) {
+                    System.out.println("Username - " + user.getUsername());
+                    if (user.IsCliente()) {
+                        System.out.println("Usuário é um Cliente");
+                        System.out.println("Nome - " + user.getCliente().getNome());
+                        System.out.println("CPF - " + user.getCliente().getCpf());
+                        System.out.println("Idade - " + user.getCliente().getIdade());
+                    } else if (user.IsEmpresa()) {
+                        System.out.println("Usuário é uma Empresa");
+                        System.out.println("ID - " + user.getEmpresa().getId());
+                        System.out.println("Nome - " + user.getEmpresa().getNome());
+                        System.out.println("CNPJ - " + user.getEmpresa().getCnpj());
+                        System.out.println("Saldo - " + user.getEmpresa().getSaldo());
+                        System.out.println("Taxa Cobrada - " + user.getEmpresa().getTaxa());
+                    } else {
+                        System.out.println("Usuário é um Administrador");
+                    }
+                    System.out.println("************************************************************");
+                }
+            }
+        }
+		    case 4 -> {
+			System.out.println("************************************************************");
 			executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
-			return;
-			}else {
-				for (Usuario user : usuarios) {
-					System.out.println("Username - " + user.getUsername());
-					if(user.IsCliente()){
-					System.out.println("Usuário é um Cliente");
-					System.out.println("Nome - " + user.getCliente().getNome());
-					System.out.println("CPF - " + user.getCliente().getCpf());
-					System.out.println("Idade - " + user.getCliente().getIdade());
-				}else if (user.IsEmpresa()){
-					System.out.println("Usuário é uma Empresa");
-					System.out.println("ID - " + user.getEmpresa().getId());
-					System.out.println("Nome - " + user.getEmpresa().getNome());
-					System.out.println("CNPJ - " + user.getEmpresa().getCnpj());
-					System.out.println("Saldo - " + user.getEmpresa().getSaldo());
-					System.out.println("Taxa Cobrada - " + user.getEmpresa().getTaxa());
-				}else{
-					System.out.println("Usuário é um Administrador");
-				}
-					System.out.println("************************************************************");
-				}
-			}
-			}
-			case 0 -> {
-				repositorioUsuario.logout();
-				executar(usuarios, empresas, produtos, carrinho, vendas);
-				return;
-			}
-		}
+        }
+        case 0 -> {
+            repositorioUsuario.logout();
+            executar(usuarios, empresas, produtos, carrinho, vendas); // Volta ao menu principal
+            return;
+        }
+    }
 
-		executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);	
+    // Se nenhuma opção válida foi escolhida, chama a função executarAdmin novamente
+    executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
+}
 
-		}
 		public static void executarEmpresa(Scanner scanner, List<Usuario> usuarios, Usuario usuario, List<Empresa> empresas,
 								  List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
 		System.out.println("1 - Listar vendas");
 		System.out.println("2 - Ver produtos");
+		System.out.println("3 - Menu Principal");
 		System.out.println("0 - Deslogar");
 
 		switch (scanner.nextInt()) {
@@ -185,6 +222,15 @@ public class Main {
 				System.out.println("Saldo da empresa: " + usuario.getEmpresa().getSaldo());
 				System.out.println("************************************************************");
 			}
+				    
+			case 3 -> {
+			System.out.println("************************************************************");
+			if(usuario.getUsername() != "admin"){
+				executarEmpresa(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);
+				return;
+        }else{
+		executarAdmin(scanner, usuarios, usuario, empresas, produtos, carrinho, vendas);}
+        }
 			case 0 -> {
 				if (repositorioUsuario.getUsuarioLogado().IsAdmin()) repositorioUsuario.getUsuarioLogado().setEmpresa(null);
 
