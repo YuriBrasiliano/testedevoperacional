@@ -3,7 +3,7 @@ import java.util.Optional;
 import java.util.Scanner;
 import model.*;
 import banco.*;
-import repositorios.*;
+import Repositorio.*;
 
 public class Main {
 
@@ -101,6 +101,7 @@ public class Main {
 								  List<Produto> produtos, List<Produto> carrinho, List<Venda> vendas) {
 		System.out.println("1 - Listar vendas");
 		System.out.println("2 - Ver produtos");
+		System.out.println("3 - Menu Inicial");
 		System.out.println("0 - Deslogar");
 
 		switch (scanner.nextInt()) {
@@ -152,6 +153,10 @@ public class Main {
 
 				System.out.println("Saldo da empresa: " + usuario.getEmpresa().getSaldo());
 				System.out.println("************************************************************");
+			}
+			case 3 -> {
+				System.out.println("************************************************************");
+				executarAdmin(scanner, usuario, usuarios, empresas, produtos, carrinho, vendas);
 			}
 			case 0 -> {
 				if (repositorioUsuario.getUsuarioLogado().IsAdmin()) repositorioUsuario.getUsuarioLogado().setEmpresa(null);

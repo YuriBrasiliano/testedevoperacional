@@ -1,4 +1,4 @@
-package repositorios;
+package Repositorio;
 
 /**
  * Classe que representa um objeto para tratamento de erros e resultados de operações.
